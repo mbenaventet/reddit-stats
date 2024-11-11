@@ -10,9 +10,13 @@ function TopPosts() {
         const fetchPosts = async () => {
             try {
                 const response = await axios.get('/api/science/top-posts');
-                setPosts(response.data);
+                if (response.data && Array.isArray(response.data)) {
+                    setPosts(response.data);
+                } else {
+                    throw new Error('Invalid data format');
+                }
             } catch (error) {
-                console.error('Error fetching posts:', error);
+                //console.error('Error fetching posts:', error);
                 setError('Failed to load posts. Please try again later.');
             } finally {
                 setLoading(false);

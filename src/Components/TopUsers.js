@@ -12,7 +12,7 @@ function TopUsers() {
                 const response = await axios.get('/api/science/top-users');
                 setUsers(response.data);
             } catch (error) {
-                console.error('Error fetching users:', error);
+                //console.error('Error fetching users:', error);
                 setError('Failed to load users. Please try again later.');
             } finally {
                 setLoading(false);
@@ -30,8 +30,8 @@ function TopUsers() {
             {!loading && !error && (
                 <ul>
                     {users.map((user, index) => (
-                        <li key={index}>
-                            {user.user}: {user.count} posts
+                        <li key={user.id} data-testid={`user-${user.id}`}>
+                            {user.user} - {user.count} posts
                         </li>
                     ))}
                 </ul>
