@@ -1,36 +1,40 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import axios from 'axios';
-import TopUsers from './TopUsers';
-
-jest.mock('axios');
+import { render, screen } from '@testing-library/react';
+import TopUsers from './TopUsers'; // Import the component
 
 describe('TopUsers Component', () => {
-  it('should fetch and display users', async () => {
-    // Mock a successful response for axios.get
-    axios.get.mockResolvedValue({
-      data: [
-        { id: '1', user: 'User1', count: 120 },
-        { id: '2', user: 'User2', count: 100 },
-      ],
-    });
-
-    render(<TopUsers />);
-    //screen.debug();
-
-    // Wait for the users to be rendered and use data-testid to verify content
-    await waitFor(() => expect(screen.getByTestId('user-1')).toHaveTextContent('User1 - 120 posts'));
-    expect(screen.getByTestId('user-1')).toHaveTextContent('User1 - 120 posts');
-    expect(screen.getByTestId('user-2')).toHaveTextContent('User2 - 100 posts');
+  // Test if the component renders
+  it('renders without crashing', () => {
+    render(<TopUsers data={[]} />);
+    const heading = screen.getByText(/Top Users with Most Posts/i);
+    expect(heading).toBeInTheDocument();
   });
 
-  it('should handle error when fetching users', async () => {
-    // Mock an error response for axios.get
-    axios.get.mockRejectedValue(new Error('Failed to load users. Please try again later.'));
+  // Test if data is displayed correctly
+  it('displays users and their post counts', () => {
+    const data = [
+      { id: 1, user: 'User1', count: 120 },
+      { id: 2, user: 'User2', count: 100 },
+    ];
 
-    render(<TopUsers />);
+    render(<TopUsers data={data} />);
 
-    // Use findByText to handle error message display
-    await expect(screen.findByText('Failed to load users. Please try again later.')).resolves.toBeInTheDocument();
+    // Check if the user names and post counts are rendered
+    expect(screen.getByText('User1 - 120 posts')).toBeInTheDocument();
+    expect(screen.getByText('User2 - 100 posts')).toBeInTheDocument();
+  });
+
+  // Test if no users are displayed when data is empty
+  it('does not display any users when data is empty', () => {
+    render(<TopUsers data={[]} />);
+    const listItems = screen.queryAllByTestId(/^user-/); // Query by test id pattern
+    expect(listItems).toHaveLength(0); // Should be no list items
+  });
+
+  // Test if undefined data does not break the component
+  it('does not break when data is undefined', () => {
+    render(<TopUsers data={undefined} />);
+    const heading = screen.getByText(/Top Users with Most Posts/i);
+    expect(heading).toBeInTheDocument();
   });
 });
