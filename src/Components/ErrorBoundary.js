@@ -13,7 +13,10 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     // Log error info (you can send this to a logging service)
-    console.error("Something went wrong:", error, errorInfo);
+    if (process.env.NODE_ENV !== 'test') {
+        console.error("Something went wrong:", error, errorInfo);
+    }
+    
   }
 
   render() {
